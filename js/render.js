@@ -245,17 +245,26 @@ function createCardElement(fileInfo, index) {
   return card;
 }
 
-function renderBlogList(searchResult) {
+function renderBlogList(searchResult = null, currentPage = 1) {
   /*
     blog의 main 영역에 블로그 포스트 목록을 렌더링
     1. 검색 키워드 없이 대부분 renderBlogList()로 사용.
     2. 검색을 했을 때에만 searchResult에 목록이 담겨 들어옴
     */
+  const pageUnit = 10;
+
   if (searchResult) {
     // 검색 keyword가 있을 경우
     document.getElementById("blog-posts").style.display = "grid";
     document.getElementById("blog-posts").innerHTML = "";
-    searchResult.forEach((post, index) => {
+
+    const totalPage = Math.ceil(searchResult.length / pageUnit);
+    initPagination(totalPage);
+    renderPagination(totalPage, 1, searchResult);
+
+    const startIndex = (currentPage - 1) * pageUnit;
+    const endIndex = currentPage * pageUnit;
+    searchResult.slice(startIndex, endIndex).forEach((post, index) => {
       const postInfo = extractFileInfo(post.name);
       if (postInfo) {
         const cardElement = createCardElement(postInfo, index);
@@ -267,6 +276,7 @@ function renderBlogList(searchResult) {
           document.getElementById("contents").style.display = "block";
           // blog-posts 영역을 보이지 않게 처리
           document.getElementById("blog-posts").style.display = "none";
+          document.getElementById("pagination").style.display = "none";
           fetch(post.download_url)
             .then((response) => response.text())
             .then((text) =>
@@ -289,10 +299,18 @@ function renderBlogList(searchResult) {
   } else {
     // 검색 keyword가 없을 경우
     document.getElementById("blog-posts").style.display = "grid";
+    document.getElementById("pagination").style.display = "flex";
     document.getElementById("blog-posts").innerHTML = "";
 
+    const totalPage = Math.ceil(blogList.length / pageUnit);
+    initPagination(totalPage);
+    renderPagination(totalPage, 1);
+
+    const startIndex = (currentPage - 1) * pageUnit;
+    const endIndex = currentPage * pageUnit;
+
     // console.log("blogList", blogList);
-    blogList.forEach((post, index) => {
+    blogList.slice(startIndex, endIndex).forEach((post, index) => {
       const postInfo = extractFileInfo(post.name);
       if (postInfo) {
         // console.log(postInfo)
@@ -305,6 +323,8 @@ function renderBlogList(searchResult) {
           document.getElementById("contents").style.display = "block";
           // blog-posts 영역을 보이지 않게 처리
           document.getElementById("blog-posts").style.display = "none";
+          document.getElementById("pagination").style.display = "none";
+
           // console.log(post)
           // console.log(post.download_url)
           let postDownloadUrl;
@@ -334,6 +354,7 @@ function renderBlogList(searchResult) {
         document.getElementById("blog-posts").appendChild(cardElement);
       }
     });
+
     // contents 영역을 보이지 않게 처리
     document.getElementById("contents").style.display = "none";
   }
@@ -452,36 +473,152 @@ function renderBlogCategory() {
   });
 }
 
-function renderPagination() {
-  let pageLength = 10;
-  // 페이지네이션이 있는 경우에 실행할 함수
-  const $pagination = document.getElementById("pagination");
-  $pagination.classList.add(...paginationStyle.split(" "));
+function initPagination(totalPage) {
+  const pagination = document.getElementById("pagination");
+
+  pagination.style.display = "flex";
+
+  pagination.classList.add(...paginationStyle.split(" "));
 
   const prevButton = document.createElement("button");
   prevButton.setAttribute("id", "page-prev");
   prevButton.classList.add(...pageMoveButtonStyle.split(" "));
+  const pageNav =
+    pagination.querySelector("nav") || document.createElement("nav");
+  pageNav.innerHTML = "";
+
+  pageNav.setAttribute("id", "pagination-list");
+  pageNav.classList.add(...pageNumberListStyle.split(" "));
+  const docFrag = document.createDocumentFragment();
+  for (let i = 0; i < totalPage; i++) {
+    if (i === 7) {
+      break;
+    }
+
+    const page = document.createElement("button");
+    page.classList.add(...pageNumberStyle.split(" "));
+    docFrag.appendChild(page);
+  }
+  pageNav.appendChild(docFrag);
 
   const nextButton = document.createElement("button");
   nextButton.setAttribute("id", "page-next");
   nextButton.classList.add(...pageMoveButtonStyle.split(" "));
 
-  const pageNav = document.createElement("nav");
-  pageNav.setAttribute("id", "pagination-list");
-  pageNav.classList.add(...pageNumberListStyle.split(" "));
-
-  // pageLength만큼 자식요소 만들기
-  for (let i = 0; i < pageLength; i++) {
-    const page = document.createElement("button");
-    page.classList.add(...pageNumberStyle.split(" "));
-    page.textContent = i + 1;
-    pageNav.appendChild(page);
+  if (!pagination.innerHTML) {
+    pagination.append(prevButton, pageNav, nextButton);
   }
-  $pagination.appendChild(prevButton);
-  $pagination.appendChild(pageNav);
-  $pagination.appendChild(nextButton);
+  if (totalPage <= 1) {
+    pagination.style.display = "none";
+    return;
+  }
 }
-renderPagination();
+
+function renderPagination(totalPage, currentPage, targetList = null) {
+  const prevButton = document.getElementById("page-prev");
+  const nextButton = document.getElementById("page-next");
+  if (currentPage === 1) {
+    prevButton.setAttribute("disabled", true);
+    nextButton.removeAttribute("disabled");
+  } else if (currentPage === totalPage) {
+    nextButton.setAttribute("disabled", true);
+    prevButton.removeAttribute("disabled");
+  } else {
+    prevButton.removeAttribute("disabled");
+    nextButton.removeAttribute("disabled");
+  }
+  prevButton.onclick = (event) => {
+    event.preventDefault();
+    renderBlogList(targetList, currentPage - 1);
+    renderPagination(totalPage, currentPage - 1, targetList);
+  };
+  nextButton.onclick = (event) => {
+    event.preventDefault();
+    renderBlogList(targetList, currentPage + 1);
+    renderPagination(totalPage, currentPage + 1, targetList);
+  };
+
+  const pageNav = document.querySelector("#pagination nav");
+  const pageList = pageNav.querySelectorAll("button");
+
+  if (totalPage <= 7) {
+    pageList.forEach((page, index) => {
+      page.textContent = index + 1;
+      if (index + 1 === currentPage) {
+        page.classList.remove("font-normal");
+        page.classList.add(...pageNumberActiveStyle.split(" "));
+      } else {
+        page.classList.remove(...pageNumberActiveStyle.split(" "));
+        page.classList.add("font-normal");
+      }
+      page.onclick = (event) => {
+        renderBlogList(targetList, index + 1);
+        renderPagination(totalPage, index + 1, targetList);
+      };
+    });
+  } else {
+    if (currentPage <= 4) {
+      ellipsisPagination(
+        pageList,
+        [1, 2, 3, 4, 5, "...", totalPage],
+        targetList
+      );
+    } else if (currentPage > totalPage - 4) {
+      ellipsisPagination(
+        pageList,
+        [
+          1,
+          "...",
+          totalPage - 4,
+          totalPage - 3,
+          totalPage - 2,
+          totalPage - 1,
+          totalPage,
+        ],
+        targetList
+      );
+    } else {
+      ellipsisPagination(
+        pageList,
+        [
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPage,
+        ],
+        targetList
+      );
+    }
+  }
+
+  function ellipsisPagination(pageList, indexList, targetList = null) {
+    pageList.forEach((page, index) => {
+      page.textContent = indexList[index];
+      if (indexList[index] === currentPage) {
+        page.classList.remove("font-normal");
+        page.classList.add(...pageNumberActiveStyle.split(" "));
+      } else {
+        page.classList.remove(...pageNumberActiveStyle.split(" "));
+        page.classList.add("font-normal");
+      }
+      if (indexList[index] === "...") {
+        page.style.pointerEvents = "none";
+        page.onclick = (event) => {
+          event.preventDefault();
+        };
+      } else {
+        page.style.pointerEvents = "all";
+
+        page.onclick = (event) => {
+          renderPagination(totalPage, indexList[index], targetList);
+        };
+      }
+    });
+  }
+}
 
 async function initialize() {
   /*
