@@ -16,7 +16,7 @@
 ## 스폰서
 - 커피 한 잔 값으로 위니브의 활동을 지원하고 기여자로 참여하세요!
 
-<a style="border:solid 1px black;" href="https://github.com/sponsors/weniv?o=esb">후원하기</a>
+[후원하기](https://github.com/sponsors/weniv?o=esb)
 
 
 ## 사용 가이드
