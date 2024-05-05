@@ -14,8 +14,9 @@
 
 
 ## 스폰서
-- GitHub 스폰서를 등록하고 오픈소스 프로젝트, 책 집필 등 위니브의 교육 활동을 지원하고 기여자로 참여하세요 !
-<iframe src="https://github.com/sponsors/weniv/button" title="Sponsor weniv" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
+- 커피 한 잔 값으로 위니브의 활동을 지원하고 기여자로 참여하세요!
+
+<a href="https://github.com/sponsors/weniv?o=esb"><button>후원하기</button></a>
 
 
 ## 사용 가이드
