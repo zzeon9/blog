@@ -1,4 +1,4 @@
-const defaultTitle = "WENIVLOG";
+const defaultTitle = "zzeon9.github.io";
 // 현재 url 가져와서 parsing (url 스키마는 readme.md 참고)
 const url = new URL(window.location.href);
 const origin = url.origin + url.pathname;
