@@ -231,3 +231,41 @@
   mask-repeat: no-repeat;
   mask-position: center center;
 }/*# sourceMappingURL=style.css.map */
+
+#sidebar-open-button {
+  width: 1.5rem;
+  height: 1.5rem;
+  align-items: center;
+  background-color: #8d9299;
+  -webkit-mask-image: url("../img/icon/icon-sidebar-open.svg");
+  -webkit-mask-size: 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center center;
+  mask-image: url("../img/icon/icon-sidebar-open.svg");
+  mask-size: 100%;
+  mask-repeat: no-repeat;
+  mask-position: center center;
+}
+#sidebar-open-button:hover, #sidebar-open-button.active {
+  background-color: #121314;
+}
+#sidebar-home-button {
+  width: 1.5rem;
+  height: 1.5rem;
+  align-items: center;
+  color: #8d9299;
+  background-color: #8d9299;
+  -webkit-mask-image: url("../img/icon/icon-sidebar-home.svg");
+  -webkit-mask-size: 100%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center center;
+  mask-image: url("../img/icon/icon-sidebar-home.svg");
+  mask-size: 100%;
+  mask-repeat: no-repeat;
+  mask-position: center center;
+}
+#sidebar-home-button:hover, #sidebar-home-button.active {
+  background-color: #121314;
+  color: #121314;
+  cursor: pointer;
+}

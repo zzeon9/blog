@@ -1,3 +1,5 @@
+/* style 변경하고 싶을 경우, Tailwind CSS 검색 후 Docs 참고하여 수정하면 됨 */
+
 // menu style
 const menuListStyle = `md:ml-10 text-base leading-snug text-surface hover:text-graylv3 font-medium capitalize`;
 
